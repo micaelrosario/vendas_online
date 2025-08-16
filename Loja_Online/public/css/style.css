@@ -1,0 +1,29 @@
+body * {
+    border-radius: 3px;
+    background-color: #f8f9fa;
+}
+
+.border {
+    border-color: rgba(187, 185, 185, 84%) !important;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
