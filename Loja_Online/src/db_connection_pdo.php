@@ -1,5 +1,9 @@
 <?php
 
+// definir a codificacao como UTF-8 (no PHP)
+mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+
 $db_host = 'localhost';
 $db_name = 'sistema_vendas_online'; 
 $db_user = 'root'; 
