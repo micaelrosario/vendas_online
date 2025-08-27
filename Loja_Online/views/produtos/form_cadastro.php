@@ -28,14 +28,14 @@
     <div class="container">
 
         <h2 class="text-center py-4">Cadastrar Produto:</h2>
-        <form action="ProdutoController.php" method="post">
+        <form action="controllers/produtoController.php" method="post">
             <?php
             createInput("sku", "text", "SKU:");
             createInput("nome", "text", "Nome do Produto:");
             createInput("descricao", "text", "Descrição:");
-            createInput("preco_custo", "text", "Preço do Produto:");
-            createInput("preco_venda", "text", "Valor Total:");
-            createInput("qtd_estoque", "text", "Quantidade no Estoque:");
+            createInput("preco_custo", "number", "Preço do Produto:");
+            createInput("preco_venda", "number", "Valor Total:");
+            createInput("qtd_estoque", "number", "Quantidade no Estoque:");
             ?>
 
             <div class="mb-3">
