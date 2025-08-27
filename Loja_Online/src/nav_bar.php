@@ -1,13 +1,11 @@
-<nav class="navbar navbar-expand-lg bg-dark border-bottom border-body mb-4" data-bs-theme="dark">
+<nav class="navbar navbar-expand-lg bg-success border-bottom border-body mb-4" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">STREAMING VIDEO</a>
+        <a class="navbar-brand mx-4" href="index.php">LOJA ONLINE</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-                <!-- TUDO QUE ESTIVER DENTRO DESSE TAG <ul> aparecera no NAVBAR -->
-
+            <ul class="navbar-nav ms-auto mx-5 p-1">
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="index.php">Home</a>
                 </li>
@@ -37,14 +35,7 @@
                     </ul>
                 </li>
 
-                <!-- 
-                <li class="nav-item">
-                    <a class="nav-link" href="">Botao Simples Aqui</a>
-                </li> 
-                -->
-
-                <!-- FIM DOS BOTões  DO NAVBAR -->
-            </ul>
+                </ul>
         </div>
     </div>
 </nav>
