@@ -1,0 +1,20 @@
+{
+    "recommendations": [
+        "streetsidesoftware.code-spell-checker-portuguese-brazilian",
+        "streetsidesoftware.code-spell-checker",
+        "cschlosser.doxdocgen",
+        "yzhang.markdown-all-in-one",
+        "bierner.markdown-preview-github-styles",
+        "neilbrayfield.php-docblocker",
+        "bmewburn.vscode-intelephense-client",
+        "MS-CEINTL.vscode-language-pack-pt-BR"
+    ],
+    "unwantedRecommendations": [
+        "DavidAnson.vscode-markdownlint",
+        "firefox-devtools.vscode-firefox-debug",
+        "xdebug.php-debug",
+        "Oracle.oracledevtools",
+        "mtxr.sqltools",
+        "ms-mssql.mssql",
+    ]
+}
