@@ -18,13 +18,25 @@
     ?>
 
     <div class="container">
-        <h2 class="text-center my-4">Buscar produto por:</h2>
+        <h2 class="text-center my-2">Buscar produto por:</h2>
         
-        <!-- O formulário foi removido, agora o campo de input aciona a busca automaticamente -->
-        <div class="mb-3">
-            <label for="termo_busca" class="form-label">Nome, SKU ou ID do Produto:</label>
-            <input type="text" class="form-control" id="termo_busca" name="termo_busca" placeholder="Digite para buscar..." value="<?php echo isset($_POST['termo_busca']) ? htmlspecialchars($_POST['termo_busca']) : '' ?>">
-        </div>
+        <form action="consulta_produto.php" method="POST">
+            <div class="mb-3">
+                <label for="termo_busca" class="form-label">Nome ou SKU do Produto:</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="termo_busca" 
+                    name="termo_busca" 
+                    placeholder="Digite o termo e clique em Buscar" 
+                    value="<?php echo isset($_POST['termo_busca']) ? htmlspecialchars($_POST['termo_busca']) : '' ?>"
+                >
+            </div>
+            
+            <div class="mb-3 text-center">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+        </form>
 
         <h2 class="text-center">Produtos Cadastrados</h2>
 
@@ -171,4 +183,3 @@
 </body>
 
 </html>
-

@@ -58,9 +58,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="categorias" class="form-label">Categoria:</label>
+                        <label for="categorias" class="form-label">Selecione a Categoria:</label>
                         <select name="id_categoria" id="categorias" class="form-control" required>
-                            <option value="">Selecione a Categoria</option>
+                            <option value="">Nenhum</option>
                             <?php foreach ($categorias as $categoria): ?>
                                 <option value="<?php echo htmlspecialchars($categoria['id_categoria']); ?>">
                                     <?php echo htmlspecialchars($categoria['nome']); ?>

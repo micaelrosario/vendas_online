@@ -4,75 +4,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Categorias</title>
+    <title>Consultar Categoria</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
 </head>
 
 <body>
     <?php
-    // =================================================================
-    // ARQUIVOS DE CONFIGURAÇÃO E FUNÇÃO DE BUSCA
-    // =================================================================
+    // import do PHP
     require_once './src/bootstrap_components.php';
     require_once './src/nav_bar.php';
     require_once './src/db_connection_pdo.php';
-
-    /**
-     * Função que busca as categorias no banco de dados e renderiza a tabela HTML.
-     * @param PDO $conn A conexão com o banco de dados.
-     */
-    function renderizar_tabela_categorias($conn)
-    {
-        $termo_busca = "";
-        $where_clause = "";
-
-        // Prepara a cláusula WHERE se um termo de busca for enviado
-        if (isset($_POST['termo_busca']) && !empty($_POST['termo_busca'])) {
-            $termo_busca = "%" . $_POST["termo_busca"] . "%";
-            $where_clause = "WHERE nome LIKE :termo_busca OR descricao LIKE :termo_busca";
-        }
-
-        try {
-            $consulta_sql = "SELECT id_categoria, nome, descricao FROM categorias {$where_clause}";
-            $resultados = $conn->prepare($consulta_sql);
-
-            if (!empty($where_clause)) {
-                $resultados->bindValue(':termo_busca', $termo_busca);
-            }
-
-            $resultados->execute();
-            $tabela_dados = $resultados->fetchAll(PDO::FETCH_ASSOC);
-
-            // Usa a função createTable para exibir os dados
-            createTable(
-                ["nome" => "Nome", "descricao" => "Descrição"],
-                $tabela_dados,
-                [
-                    ["id_categoria" => '<a href="atualizar_categoria.php?id=:id_categoria"><img src="img/edit_icon.png" width="32pt" height="32pt" alt="Editar"></a>'],
-                    ["id_categoria" => '<a href="deletar_categoria.php?id=:id_categoria"><img src="img/delete_icon.png" width="32pt" height="32pt" alt="Deletar"></a>'],
-                ]
-            );
-        } catch (PDOException $e) {
-            echo "<div class='alert alert-danger'><b>Error:</b> " . $e->getMessage() . "</div>";
-        }
-    }
-
-    // =================================================================
-    // VERIFICA SE É UMA REQUISIÇÃO AJAX (PARA BUSCA DINÂMICA)
-    // =================================================================
-    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        renderizar_tabela_categorias($conn);
-        exit(); // Encerra o script para não enviar o HTML completo
-    }
     ?>
 
-    <!-- ================================================================= -->
-    <!-- ESTRUTURA HTML DA PÁGINA COMPLETA -->
-    <!-- ================================================================= -->
     <div class="container">
-        <h2 class="text-center my-4">Buscar Categoria:</h2>
+        <h2 class="text-center my-2">Buscar Categoria por:</h2>
         
+        <form action="consulta_categoria.php" method="POST">
+            <div class="mb-3">
+                <label for="termo_busca" class="form-label">Nome ou Descrição da Categoria:</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="termo_busca" 
+                    name="termo_busca" 
+                    placeholder="Digite para buscar..."
+                    value="<?php echo isset($_POST['termo_busca']) ? htmlspecialchars($_POST['termo_busca']) : '' ?>"
+                >
+            </div>
+            
+            <div class="mb-3 text-center">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+        </form>
+
         <div class="mb-3">
             <label for="termo_busca" class="form-label">Nome ou Descrição da Categoria:</label>
             <input type="text" class="form-control" id="termo_busca" name="termo_busca" placeholder="Digite para buscar...">
@@ -80,20 +45,74 @@
 
         <h2 class="text-center">Categorias Cadastradas</h2>
 
-        <!-- Container que será atualizado dinamicamente pelo JavaScript -->
+        <!-- Este container será atualizado dinamicamente pelo JavaScript -->
         <div id="tabela-container">
             <?php
-            // Na carga inicial da página, renderiza a tabela com todas as categorias
-            renderizar_tabela_categorias($conn);
-            ?>
+                // Lógica para preparar os termos de busca
+                $termo_busca = "";
+                $like_termo_busca = "%";
+                $where_clause = "";
+
+                // Verifica se um termo de busca foi enviado via POST
+                if (isset($_POST['termo_busca']) && !empty($_POST['termo_busca'])) {
+                    $termo_busca = $_POST["termo_busca"];
+                    $like_termo_busca = "%" . $termo_busca . "%";
+                    
+                    // Define em quais colunas da tabela "categoria" a busca será feita
+                    $conditions = [
+                        "cat.nome LIKE :like_termo", 
+                        "cat.descricao LIKE :like_termo"
+                    ];
+
+                    // Adiciona a busca por ID apenas se o termo for numérico
+                    if (is_numeric($termo_busca)) {
+                        $conditions[] = "cat.id_categoria = :termo_id";
+                    }
+                    $where_clause = "WHERE " . implode(" OR ", $conditions);
+                }
+
+                try {
+                    // A consulta SQL foi adaptada para a tabela "categoria"
+                    $consulta_sql = <<<HEREDOC
+                        SELECT 
+                            cat.id_categoria,
+                            cat.nome,
+                            cat.descricao
+                        FROM 
+                            categorias AS cat
+                        {$where_clause}
+                    HEREDOC;
+
+                    $resultados = $conn->prepare($consulta_sql);
+
+                    // Binda os parâmetros de forma condicional
+                    if (!empty($where_clause)) {
+                        $resultados->bindValue(':like_termo', $like_termo_busca);
+                        if (is_numeric($termo_busca)) {
+                            $resultados->bindValue(':termo_id', $termo_busca, PDO::PARAM_INT);
+                        }
+                    }
+                    
+                    $resultados->execute();
+                    $tabela_dados = $resultados->fetchAll(PDO::FETCH_ASSOC);
+
+                    // A partir daqui, você usaria a variável $tabela_dados para mostrar os resultados na sua tabela HTML.
+                    // Exemplo: createTable(["nome" => "Nome da Categoria", "descricao" => "Descrição"], $tabela_dados, [...]);
+
+                } catch (PDOException $e) {
+                    // Trata o erro
+                    echo "<div class='alert alert-danger'><b>Error:</b> " . $e->getMessage() . "</div>";
+                }
+                ?>
         </div>
     </div>
 
+    <!-- Carrega javascript do Bootstrap -->
     <script src="js/bootstrap.bundle.min.js"></script>
     
-    <!-- JavaScript para a busca dinâmica (AJAX) -->
+    <!-- JavaScript para busca dinâmica (AJAX) -->
     <script>
-        // Função 'debounce' para evitar múltiplas requisições enquanto o usuário digita
+        // Função para atrasar a execução da busca (evita sobrecarregar o servidor)
         function debounce(func, delay) {
             let timeout;
             return function(...args) {
@@ -106,20 +125,33 @@
         const inputBusca = document.getElementById('termo_busca');
         const tabelaContainer = document.getElementById('tabela-container');
 
-        // Função assíncrona que busca os dados no servidor
+        // Função que realiza a busca
         const buscarCategorias = async (termo) => {
+            // Prepara os dados para enviar
             const formData = new FormData();
             formData.append('termo_busca', termo);
 
             try {
-                const response = await fetch('consultar_categorias.php', {
+                // Faz a requisição para a própria página
+                const response = await fetch('consultar_produtos.php', {
                     method: 'POST',
                     body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' } // Cabeçalho que identifica a requisição como AJAX
+                    headers: { // Cabeçalho para identificar a requisição como AJAX
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 
-                // A resposta do servidor (apenas a tabela) é inserida no container
-                tabelaContainer.innerHTML = await response.text();
+                const htmlResponse = await response.text();
+
+                // Usa DOMParser para extrair apenas o conteúdo da tabela da resposta
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlResponse, 'text/html');
+                const novaTabela = doc.getElementById('tabela-container');
+                
+                // Atualiza o container da tabela com o novo conteúdo
+                if (novaTabela) {
+                    tabelaContainer.innerHTML = novaTabela.innerHTML;
+                }
 
             } catch (error) {
                 console.error('Erro ao buscar categorias:', error);
@@ -127,10 +159,10 @@
             }
         };
 
-        // Adiciona o evento 'input' ao campo de busca, com o debounce
+        // Adiciona o evento 'input' ao campo de busca, com o debounce de 300ms
         inputBusca.addEventListener('input', debounce((e) => {
             buscarCategorias(e.target.value);
-        }, 300)); // Aguarda 300ms após o usuário parar de digitar
+        }, 300));
     </script>
 </body>
 

@@ -1,7 +1,8 @@
-<nav class="navbar navbar-expand-lg bg-dark border-bottom border-body mb-4" data-bs-theme="dark">
+<nav class="navbar navbar-expand-lg bg-success border-bottom border-body mb-4 py-2
+" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">STREAMING VIDEO</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand px-2" href="index.php">Loja Online</a>
+        <button class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -17,13 +18,10 @@
                         Consultas
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="consulta_video.php">Vídeos</a></li>
-                        <li><a class="dropdown-item" href="consulta_video_join.php">Vídeos com JOIN</a></li>
-                        <li><a class="dropdown-item" href="consulta_genero.php">Gêneros</a></li>
-                        <li><a class="dropdown-item" href="consulta_avaliacao.php">Avaliação</a></li>
-                        <li><a class="dropdown-item" href="consulta_visualizacao.php">Visualização</a></li>
-                        <li><a class="dropdown-item" href="consulta_visualizacao_join.php">Visualização com JOIN</a></li>
-                        <li><a class="dropdown-item" href="consulta_usuario.php">Usuários</a></li>
+                        <li><a class="dropdown-item" href="consulta_produto.php">Produtos</a></li>
+                        <li><a class="dropdown-item" href="consulta_categoria.php">Categorias</a></li>
+                        <li><a class="dropdown-item" href="consulta_cliente.php">Clientes</a></li>
+                        <li><a class="dropdown-item" href="consulta_pedido.php">Pedidos</a></li>
                     </ul>
                 </li>
 
@@ -32,8 +30,9 @@
                         Cadastrar
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="cadastrar_usuario.php">Usuários</a></li>
-                        <li><a class="dropdown-item" href="cadastrar_video.php">Videos</a></li>
+                        <li><a class="dropdown-item" href="cadastrar_produto.php">Produtos</a></li>
+                        <li><a class="dropdown-item" href="cadastrar_categoria.php">Categorias</a></li>
+                        <li><a class="dropdown-item" href="cadastrar_cliente.php">Clientes</a></li>
                     </ul>
                 </li>
 

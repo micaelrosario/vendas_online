@@ -23,27 +23,27 @@
                 <form class="mb-4" action="cadastrar_cliente.php" method="post">
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome Completo:</label>
-                        <input type="text" name="nome" id="nome" class="form-control" required>
+                        <input type="text" name="nome" id="nome" class="form-control"  placeholder="Digite seu nome completo"  required>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-3 ">
                         <label for="cpf_cnpj" class="form-label">CPF ou CNPJ:</label>
-                        <input type="text" name="cpf_cnpj" id="cpf_cnpj" class="form-control" required>
+                        <input type="text" name="cpf_cnpj" id="cpf_cnpj" class="form-control" placeholder="000.000.000-00"  required>
                     </div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email:</label>
-                        <input type="email" name="email" id="email" class="form-control" required>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="seuemail@exemplo.com" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="telefone" class="form-label">Telefone:</label>
-                        <input type="tel" name="telefone" id="telefone" class="form-control">
+                        <input type="tel" name="telefone" id="telefone" class="form-control" placeholder="(73) 99999-9999">
                     </div>
 
                     <div class="mb-3">
                         <label for="endereco" class="form-label">Endereço:</label>
-                        <input type="text" name="endereco" id="endereco" class="form-control">
+                        <input type="text" name="endereco" id="endereco" class="form-control" placeholder="Ex: Rua das Flores, 123, Centro">
                     </div>
 
                     <div class="d-grid">
