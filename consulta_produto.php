@@ -12,50 +12,31 @@
 <body>
     <?php
     // import do PHP
-    require_once './src/bootstrap_components.php';
     require_once './src/nav_bar.php';
     require_once './src/db_connection_pdo.php';
     ?>
 
     <div class="container">
-        <h2 class="text-center my-2">Buscar produto por:</h2>
-        
-        <form action="consulta_produto.php" method="POST">
+        <h2 class="text-center py-3">Buscar produto por:</h2>
+
+        <form action="consulta_produto.php" method="POST" id="form-busca">
             <div class="mb-3">
                 <label for="termo_busca" class="form-label">Nome ou SKU do Produto:</label>
-                <input 
-                    type="text" 
-                    class="form-control" 
-                    id="termo_busca" 
-                    name="termo_busca" 
-                    placeholder="Digite o termo e clique em Buscar" 
-                    value="<?php echo isset($_POST['termo_busca']) ? htmlspecialchars($_POST['termo_busca']) : '' ?>"
-                >
-            </div>
-            
-            <div class="mb-3 text-center">
-                <button type="submit" class="btn btn-primary">Buscar</button>
+                <input type="text" class="form-control" id="termo_busca" name="termo_busca" placeholder="Digite para buscar..." value="<?php echo isset($_POST['termo_busca']) ? htmlspecialchars($_POST['termo_busca']) : '' ?>">
             </div>
         </form>
 
-        <h2 class="text-center">Produtos Cadastrados</h2>
+        <h2 class="text-center py-3">Produtos Cadastrados</h2>
 
-        <!-- Este container será atualizado dinamicamente pelo JavaScript -->
         <div id="tabela-container">
             <?php
-            // Esta lógica agora serve tanto para a carga inicial quanto para as buscas AJAX.
-            $termo_busca = "";
-            $like_termo_busca = "%";
+            // Lógica PHP para buscar e exibir a tabela
+            $termo_busca = isset($_POST['termo_busca']) ? $_POST["termo_busca"] : '';
+            $like_termo_busca = "%" . $termo_busca . "%";
             $where_clause = "";
 
-            // Se um termo de busca for enviado (via POST do nosso JavaScript)
-            if (isset($_POST['termo_busca']) && !empty($_POST['termo_busca'])) {
-                $termo_busca = $_POST["termo_busca"];
-                $like_termo_busca = "%" . $termo_busca . "%";
-                
-                // CORREÇÃO: Constrói a cláusula WHERE de forma segura e dinâmica.
+            if (!empty($termo_busca)) {
                 $conditions = ["p.nome LIKE :like_termo", "p.sku LIKE :like_termo"];
-                // Adiciona a busca por ID apenas se o termo for numérico.
                 if (is_numeric($termo_busca)) {
                     $conditions[] = "p.id_produto = :termo_id";
                 }
@@ -63,122 +44,207 @@
             }
 
             try {
-                // A consulta SQL é montada dinamicamente
                 $consulta_sql = <<<HEREDOC
                     SELECT 
-                        p.id_produto,
-                        p.sku,
-                        p.nome,
-                        p.descricao,
-                        p.preco_custo,
-                        p.quantidade_estoque,
-                        c.nome AS nome_categoria
-                    FROM 
-                        produtos AS p
-                    LEFT JOIN 
-                        categorias AS c ON p.id_categoria = c.id_categoria
+                        p.id_produto, p.sku, p.nome, p.descricao, 
+                        p.preco_custo, p.quantidade_estoque, c.nome AS nome_categoria
+                    FROM produtos AS p
+                    LEFT JOIN categorias AS c ON p.id_categoria = c.id_categoria
                     {$where_clause}
+                    ORDER BY p.nome ASC
                 HEREDOC;
 
-                $resultados = $conn->prepare($consulta_sql);
+                $stmt = $conn->prepare($consulta_sql);
 
-                // CORREÇÃO: Binda os parâmetros de forma condicional e com o tipo correto.
                 if (!empty($where_clause)) {
-                    $resultados->bindValue(':like_termo', $like_termo_busca);
+                    $stmt->bindValue(':like_termo', $like_termo_busca);
                     if (is_numeric($termo_busca)) {
-                        // Usa um placeholder diferente (:termo_id) e define o tipo como inteiro.
-                        $resultados->bindValue(':termo_id', $termo_busca, PDO::PARAM_INT);
+                        $stmt->bindValue(':termo_id', $termo_busca, PDO::PARAM_INT);
                     }
                 }
-                
-                $resultados->execute();
-                $tabela_dados = $resultados->fetchAll(PDO::FETCH_ASSOC);
+                $stmt->execute();
 
-                // Mostra a tabela de produtos
-                createTable(
-                    array(
-                        "sku" => "SKU",
-                        "nome" => "Nome",
-                        "nome_categoria" => "Categoria",
-                        "preco_custo" => "Preço de Custo",
-                        "quantidade_estoque" => "Estoque"
-                    ),
-                    $tabela_dados,
-                    array(
-                        // Links de ação para atualizar e deletar produtos
-                        array("id_produto" => '<a href="atualizar_produto.php?id=:id_produto"><img src="img/edit_icon.png" width="32pt" height="32pt" alt="Editar"></a>'),
-                        array("id_produto" => '<a href="deletar_produto.php?id=:id_produto"><img src="img/delete_icon.png" width="32pt" height="32pt" alt="Deletar"></a>'),
-                    )
-                );
+                // **ALTERAÇÃO:** Geração manual da tabela para ter controle total sobre os botões
+                if ($stmt->rowCount() > 0) {
+                    echo '<div class="table-responsive"><table class="table table-striped table-hover">';
+                    echo '<thead class="table-dark"><tr><th>SKU</th><th>Nome</th><th>Categoria</th><th>Preço Custo</th><th>Estoque</th><th>Ações</th></tr></thead><tbody>';
+
+                    while ($produto = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        // Adicionamos um ID na linha (<tr>) para fácil remoção via JavaScript
+                        echo '<tr id="produto-' . htmlspecialchars($produto['id_produto']) . '">';
+                        echo '<td>' . htmlspecialchars($produto['sku']) . '</td>';
+                        echo '<td>' . htmlspecialchars($produto['nome']) . '</td>';
+                        echo '<td>' . htmlspecialchars($produto['nome_categoria']) . '</td>';
+                        echo '<td>' . htmlspecialchars($produto['preco_custo']) . '</td>';
+                        echo '<td>' . htmlspecialchars($produto['quantidade_estoque']) . '</td>';
+                        echo '<td>';
+                        echo '<a href="atualizar_produto.php?id=' . htmlspecialchars($produto['id_produto']) . '" class="btn btn-warning btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
+                        
+                        // **BOTÃO DE DELETAR MODIFICADO**
+                        // Trocamos o link por um botão com atributos data-*
+                        echo '<button type="button" class="btn btn-write btn-sm btn-deletar" 
+                                    data-id="' . htmlspecialchars($produto['id_produto']) . '" 
+                                    data-nome="' . htmlspecialchars($produto['nome']) . '" title="Deletar">
+                                <img src="img/delete_icon.png" width="20" alt="Deletar">
+                              </button>';
+                        echo '</td>';
+                        echo '</tr>';
+                    }
+                    echo '</tbody></table></div>';
+                } else {
+                    echo '<div class="alert alert-info text-center">Nenhum produto encontrado.</div>';
+                }
             } catch (PDOException $e) {
-                // Trata o erro
                 echo "<div class='alert alert-danger'><b>Error:</b> " . $e->getMessage() . "</div>";
-            }
-
-            // A desconexão só deve acontecer em uma carga de página completa
-            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
-                require './src/db_disconnect_pdo.php';
             }
             ?>
         </div>
     </div>
 
-    <!-- Carrega javascript do Bootstrap -->
+    <div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Tem certeza que deseja deletar o produto: <strong id="nomeProdutoModal"></strong>?
+                    <p class="text-danger small mt-2">Esta ação não poderá ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarDelete">Sim, Deletar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-placeholder" style="position: fixed; top: 80px; right: 20px; z-index: 1055; width: 300px;"></div>
+
     <script src="js/bootstrap.bundle.min.js"></script>
-    
-    <!-- JavaScript para busca dinâmica (AJAX) -->
+
     <script>
-        // Função para atrasar a execução da busca (evita sobrecarregar o servidor)
-        function debounce(func, delay) {
-            let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), delay);
-            };
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- LÓGICA DE BUSCA (JÁ EXISTENTE E AJUSTADA) ---
+            const inputBusca = document.getElementById('termo_busca');
+            const formBusca = document.getElementById('form-busca');
+            const tabelaContainer = document.getElementById('tabela-container');
 
-        const inputBusca = document.getElementById('termo_busca');
-        const tabelaContainer = document.getElementById('tabela-container');
+            // Previne o envio padrão do formulário de busca
+            formBusca.addEventListener('submit', function(e) {
+                e.preventDefault();
+            });
 
-        // Função que realiza a busca
-        const buscarProdutos = async (termo) => {
-            // Prepara os dados para enviar
-            const formData = new FormData();
-            formData.append('termo_busca', termo);
+            function debounce(func, delay) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), delay);
+                };
+            }
 
-            try {
-                // Faz a requisição para a própria página
-                const response = await fetch('consultar_produtos.php', {
-                    method: 'POST',
-                    body: formData,
-                    headers: { // Cabeçalho para identificar a requisição como AJAX
-                        'X-Requested-With': 'XMLHttpRequest'
+            const buscarProdutos = async (termo) => {
+                const formData = new FormData();
+                formData.append('termo_busca', termo);
+
+                try {
+                    const response = await fetch('consulta_produto.php', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const htmlResponse = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlResponse, 'text/html');
+                    const novaTabela = doc.getElementById('tabela-container');
+                    if (novaTabela) {
+                        tabelaContainer.innerHTML = novaTabela.innerHTML;
                     }
-                });
-                
-                const htmlResponse = await response.text();
+                } catch (error) {
+                    console.error('Erro ao buscar produtos:', error);
+                    tabelaContainer.innerHTML = "<div class='alert alert-danger'>Ocorreu um erro ao realizar a busca.</div>";
+                }
+            };
 
-                // Usa DOMParser para extrair apenas o conteúdo da tabela da resposta
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlResponse, 'text/html');
-                const novaTabela = doc.getElementById('tabela-container');
-                
-                // Atualiza o container da tabela com o novo conteúdo
-                if (novaTabela) {
-                    tabelaContainer.innerHTML = novaTabela.innerHTML;
+            inputBusca.addEventListener('input', debounce((e) => {
+                buscarProdutos(e.target.value);
+            }, 300));
+
+            
+            // --- NOVA LÓGICA DE DELEÇÃO COM AJAX ---
+            const modalConfirmacao = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+            const nomeProdutoModal = document.getElementById('nomeProdutoModal');
+            const btnConfirmarDelete = document.getElementById('btnConfirmarDelete');
+            
+            // Usamos o container da tabela para 'ouvir' os cliques (event delegation)
+            // Isso garante que os botões funcionem mesmo depois da tabela ser recarregada pela busca
+            tabelaContainer.addEventListener('click', function(event) {
+                // Verifica se o elemento clicado é um botão de deletar
+                const deleteButton = event.target.closest('.btn-deletar');
+                if (!deleteButton) {
+                    return;
                 }
 
-            } catch (error) {
-                console.error('Erro ao buscar produtos:', error);
-                tabelaContainer.innerHTML = "<div class='alert alert-danger'>Ocorreu um erro ao realizar a busca.</div>";
-            }
-        };
+                const idParaDeletar = deleteButton.dataset.id;
+                const nomeProduto = deleteButton.dataset.nome;
+                
+                nomeProdutoModal.textContent = nomeProduto;
+                btnConfirmarDelete.dataset.id = idParaDeletar; // Armazena o ID no botão de confirmação
+                
+                modalConfirmacao.show();
+            });
 
-        // Adiciona o evento 'input' ao campo de busca, com o debounce de 300ms
-        inputBusca.addEventListener('input', debounce((e) => {
-            buscarProdutos(e.target.value);
-        }, 300));
+            btnConfirmarDelete.addEventListener('click', function() {
+                const id = this.dataset.id;
+                
+                fetch('deletar_produto_ajax.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'id_produto=' + encodeURIComponent(id)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'sucesso') {
+                        // Remove a linha da tabela com um efeito suave
+                        const linhaParaRemover = document.getElementById('produto-' + id);
+                        if(linhaParaRemover){
+                            linhaParaRemover.style.transition = 'opacity 0.5s ease';
+                            linhaParaRemover.style.opacity = '0';
+                            setTimeout(() => linhaParaRemover.remove(), 500);
+                        }
+                        showAlert(data.mensagem, 'success');
+                    } else {
+                        showAlert(data.mensagem, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na requisição:', error);
+                    showAlert('Erro de comunicação com o servidor.', 'danger');
+                })
+                .finally(() => {
+                    modalConfirmacao.hide();
+                });
+            });
+
+            function showAlert(message, type) {
+                const alertPlaceholder = document.getElementById('alert-placeholder');
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = [
+                    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`,
+                    `   <div>${message}</div>`,
+                    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                    '</div>'
+                ].join('');
+
+                alertPlaceholder.append(wrapper);
+                
+                setTimeout(() => {
+                    wrapper.querySelector('.alert')?.classList.remove('show');
+                    setTimeout(() => wrapper.remove(), 150);
+                }, 5000);
+            }
+        });
     </script>
 </body>
 

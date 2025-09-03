@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Categoria</title>
+    <title>Consultar Clientes</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
 </head>
@@ -17,11 +17,11 @@
     ?>
 
     <div class="container">
-        <h2 class="text-center py-3">Buscar Categoria por:</h2>
+        <h2 class="text-center my-4">Consultar Clientes</h2>
         
-        <form action="consulta_categoria.php" method="POST" id="form-busca" class="mb-4">
+        <form action="consulta_cliente.php" method="POST" id="form-busca" class="mb-4">
             <div class="mb-3">
-                <label for="termo_busca" class="form-label">Nome ou Descrição da Categoria:</label>
+                <label for="termo_busca" class="form-label">Buscar por Nome ou CPF/CNPJ:</label>
                 <input 
                     type="text" 
                     class="form-control" 
@@ -33,27 +33,28 @@
             </div>
         </form>
 
-        <h2 class="text-center py-3">Categorias Cadastradas</h2>
+        <h2 class="text-center">Clientes Cadastrados</h2>
 
         <div id="tabela-container">
             <?php
-                // Lógica PHP para buscar e exibir a tabela
+                // Lógica PHP para buscar e exibir a tabela de clientes
                 $termo_busca = isset($_POST['termo_busca']) ? $_POST["termo_busca"] : '';
                 $like_termo_busca = "%" . $termo_busca . "%";
                 $where_clause = "";
 
                 if (!empty($termo_busca)) {
-                    $conditions = ["nome LIKE :like_termo", "descricao LIKE :like_termo"];
+                    // Busca por nome ou cpf_cnpj
+                    $conditions = ["nome LIKE :like_termo", "cpf_cnpj LIKE :like_termo"];
                     if (is_numeric($termo_busca)) {
-                        $conditions[] = "id_categoria = :termo_id";
+                        $conditions[] = "id_cliente = :termo_id";
                     }
                     $where_clause = "WHERE " . implode(" OR ", $conditions);
                 }
 
                 try {
                     $consulta_sql = <<<HEREDOC
-                        SELECT id_categoria, nome, descricao
-                        FROM categorias
+                        SELECT id_cliente, nome, cpf_cnpj, email, telefone
+                        FROM clientes
                         {$where_clause}
                         ORDER BY nome ASC
                     HEREDOC;
@@ -71,20 +72,22 @@
                     // Geração da tabela HTML
                     if ($stmt->rowCount() > 0) {
                         echo '<div class="table-responsive"><table class="table table-striped table-hover">';
-                        echo '<thead class="table-dark"><tr><th>Nome</th><th>Descrição</th><th style="width: 120px;">Ações</th></tr></thead><tbody>';
+                        echo '<thead class="table-dark"><tr><th>Nome</th><th>CPF/CNPJ</th><th>Email</th><th>Telefone</th><th style="width: 120px;">Ações</th></tr></thead><tbody>';
 
-                        while ($categoria = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        while ($cliente = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             // Adicionamos um ID na linha (<tr>) para fácil remoção via JavaScript
-                            echo '<tr id="categoria-' . htmlspecialchars($categoria['id_categoria']) . '">';
-                            echo '<td>' . htmlspecialchars($categoria['nome']) . '</td>';
-                            echo '<td>' . htmlspecialchars($categoria['descricao']) . '</td>';
+                            echo '<tr id="cliente-' . htmlspecialchars($cliente['id_cliente']) . '">';
+                            echo '<td>' . htmlspecialchars($cliente['nome']) . '</td>';
+                            echo '<td>' . htmlspecialchars($cliente['cpf_cnpj']) . '</td>';
+                            echo '<td>' . htmlspecialchars($cliente['email']) . '</td>';
+                            echo '<td>' . htmlspecialchars($cliente['telefone']) . '</td>';
                             echo '<td>';
-                            echo '<a href="atualizar_categoria.php?id=' . htmlspecialchars($categoria['id_categoria']) . '" class="btn btn-warning btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
+                            echo '<a href="atualizar_cliente.php?id=' . htmlspecialchars($cliente['id_cliente']) . '" class="btn btn-warning btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
                             
                             // BOTÃO DE DELETAR com atributos data-* para o JavaScript
                             echo '<button type="button" class="btn btn-danger btn-sm btn-deletar" 
-                                        data-id="' . htmlspecialchars($categoria['id_categoria']) . '" 
-                                        data-nome="' . htmlspecialchars($categoria['nome']) . '" title="Deletar">
+                                        data-id="' . htmlspecialchars($cliente['id_cliente']) . '" 
+                                        data-nome="' . htmlspecialchars($cliente['nome']) . '" title="Deletar">
                                     <img src="img/delete_icon.png" width="20" alt="Deletar">
                                   </button>';
                             echo '</td>';
@@ -92,7 +95,7 @@
                         }
                         echo '</tbody></table></div>';
                     } else {
-                        echo '<div class="alert alert-info text-center">Nenhuma categoria encontrada.</div>';
+                        echo '<div class="alert alert-info text-center">Nenhum cliente encontrado.</div>';
                     }
 
                 } catch (PDOException $e) {
@@ -115,7 +118,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Tem certeza que deseja deletar a categoria: <strong id="nomeItemModal"></strong>?
+                    Tem certeza que deseja deletar o cliente: <strong id="nomeItemModal"></strong>?
                     <p class="text-danger small mt-2">Esta ação não poderá ser desfeita.</p>
                 </div>
                 <div class="modal-footer">
@@ -152,7 +155,7 @@
                 formData.append('termo_busca', termo);
 
                 try {
-                    const response = await fetch('consulta_categoria.php', { // URL corrigida
+                    const response = await fetch('consulta_cliente.php', { // URL da própria página
                         method: 'POST',
                         body: formData,
                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -189,15 +192,15 @@
             btnConfirmarDelete.addEventListener('click', function() {
                 const id = this.dataset.id;
                 
-                fetch('deletar_categoria_ajax.php', { // URL para o script de deleção de categoria
+                fetch('deletar_cliente_ajax.php', { // URL para o script de deleção de cliente
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'id_categoria=' + encodeURIComponent(id) // Parâmetro correto
+                    body: 'id_cliente=' + encodeURIComponent(id) // Parâmetro correto
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'sucesso') {
-                        const linhaParaRemover = document.getElementById('categoria-' + id);
+                        const linhaParaRemover = document.getElementById('cliente-' + id);
                         if(linhaParaRemover) {
                             linhaParaRemover.style.transition = 'opacity 0.5s ease';
                             linhaParaRemover.style.opacity = '0';
