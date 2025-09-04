@@ -79,10 +79,10 @@
                             echo '<td>' . htmlspecialchars($categoria['nome']) . '</td>';
                             echo '<td>' . htmlspecialchars($categoria['descricao']) . '</td>';
                             echo '<td>';
-                            echo '<a href="atualizar_categoria.php?id=' . htmlspecialchars($categoria['id_categoria']) . '" class="btn btn-warning btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
+                            echo '<a href="atualizar_categoria.php?id=' . htmlspecialchars($categoria['id_categoria']) . '" class="btn btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
                             
                             // BOTÃO DE DELETAR com atributos data-* para o JavaScript
-                            echo '<button type="button" class="btn btn-danger btn-sm btn-deletar" 
+                            echo '<button type="button" class="btn btn-write btn-sm btn-deletar" 
                                         data-id="' . htmlspecialchars($categoria['id_categoria']) . '" 
                                         data-nome="' . htmlspecialchars($categoria['nome']) . '" title="Deletar">
                                     <img src="img/delete_icon.png" width="20" alt="Deletar">

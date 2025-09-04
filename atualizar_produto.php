@@ -19,7 +19,7 @@
     $id_produto = '';
     $nome = '';
     $descricao = '';
-    $preco_custo = '';
+    $preco_venda = '';
     $quantidade_estoque = '';
     $id_categoria_produto = '';
     $produto_encontrado = false;
@@ -41,7 +41,7 @@
                     $produto_encontrado = true;
                     $nome = $produto['nome'];
                     $descricao = $produto['descricao'];
-                    $preco_custo = $produto['preco_custo'];
+                    $preco_venda = $produto['preco_venda'];
                     $quantidade_estoque = $produto['quantidade_estoque'];
                     $id_categoria_produto = $produto['id_categoria'];
                 }
@@ -81,8 +81,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="preco_custo" class="form-label">Preço de Custo:</label>
-                            <input type="number" name="preco_custo" id="preco_custo" class="form-control" step="0.01" value="<?php echo htmlspecialchars($preco_custo); ?>" required>
+                            <label for="preco_venda" class="form-label">Preço de Custo:</label>
+                            <input type="number" name="preco_venda" id="preco_venda" class="form-control" step="0.01" value="<?php echo htmlspecialchars($preco_venda); ?>" required>
                         </div>
 
                         <div class="mb-3">
@@ -118,7 +118,7 @@
                     $id_produto_post = filter_input(INPUT_POST, 'id_produto', FILTER_VALIDATE_INT);
                     $nome_post = trim(filter_input(INPUT_POST, 'nome'));
                     $descricao_post = trim(filter_input(INPUT_POST, 'descricao'));
-                    $preco_custo_post = filter_input(INPUT_POST, 'preco_custo', FILTER_VALIDATE_FLOAT);
+                    $preco_venda_post = filter_input(INPUT_POST, 'preco_venda', FILTER_VALIDATE_FLOAT);
                     $quantidade_estoque_post = filter_input(INPUT_POST, 'quantidade_estoque', FILTER_VALIDATE_INT);
                     $id_categoria_post = filter_input(INPUT_POST, 'id_categoria', FILTER_VALIDATE_INT);
 
@@ -137,7 +137,7 @@
                                 UPDATE produtos SET 
                                     nome = ?, 
                                     descricao = ?, 
-                                    preco_custo = ?, 
+                                    preco_venda = ?, 
                                     quantidade_estoque = ?, 
                                     id_categoria = ?
                                 WHERE id_produto = ?
@@ -147,7 +147,7 @@
                             $stmt_update->execute([
                                 $nome_post,
                                 $descricao_post,
-                                $preco_custo_post,
+                                $preco_venda_post,
                                 $quantidade_estoque_post,
                                 $id_categoria_post,
                                 $id_produto_post

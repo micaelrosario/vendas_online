@@ -82,10 +82,10 @@
                             echo '<td>' . htmlspecialchars($cliente['email']) . '</td>';
                             echo '<td>' . htmlspecialchars($cliente['telefone']) . '</td>';
                             echo '<td>';
-                            echo '<a href="atualizar_cliente.php?id=' . htmlspecialchars($cliente['id_cliente']) . '" class="btn btn-warning btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
+                            echo '<a href="atualizar_cliente.php?id=' . htmlspecialchars($cliente['id_cliente']) . '" class="btn btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
                             
                             // BOTÃO DE DELETAR com atributos data-* para o JavaScript
-                            echo '<button type="button" class="btn btn-danger btn-sm btn-deletar" 
+                            echo '<button type="button" class="btn btn-write btn-sm btn-deletar" 
                                         data-id="' . htmlspecialchars($cliente['id_cliente']) . '" 
                                         data-nome="' . htmlspecialchars($cliente['nome']) . '" title="Deletar">
                                     <img src="img/delete_icon.png" width="20" alt="Deletar">

@@ -47,7 +47,7 @@
                 $consulta_sql = <<<HEREDOC
                     SELECT 
                         p.id_produto, p.sku, p.nome, p.descricao, 
-                        p.preco_custo, p.quantidade_estoque, c.nome AS nome_categoria
+                        p.preco_venda, p.quantidade_estoque, c.nome AS nome_categoria
                     FROM produtos AS p
                     LEFT JOIN categorias AS c ON p.id_categoria = c.id_categoria
                     {$where_clause}
@@ -75,10 +75,10 @@
                         echo '<td>' . htmlspecialchars($produto['sku']) . '</td>';
                         echo '<td>' . htmlspecialchars($produto['nome']) . '</td>';
                         echo '<td>' . htmlspecialchars($produto['nome_categoria']) . '</td>';
-                        echo '<td>' . htmlspecialchars($produto['preco_custo']) . '</td>';
+                        echo '<td>' . htmlspecialchars($produto['preco_venda']) . '</td>';
                         echo '<td>' . htmlspecialchars($produto['quantidade_estoque']) . '</td>';
                         echo '<td>';
-                        echo '<a href="atualizar_produto.php?id=' . htmlspecialchars($produto['id_produto']) . '" class="btn btn-warning btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
+                        echo '<a href="atualizar_produto.php?id=' . htmlspecialchars($produto['id_produto']) . '" class="btn btn-sm me-2" title="Editar"><img src="img/edit_icon.png" width="20" alt="Editar"></a>';
                         
                         // **BOTÃO DE DELETAR MODIFICADO**
                         // Trocamos o link por um botão com atributos data-*
