@@ -7,6 +7,7 @@
     <title>Atualizar Produto</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -29,6 +30,10 @@
     // ETAPA 1: Carregar os dados do produto para o formulário
     if (isset($_GET['id'])) {
         $id_produto = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $_POST['preco_venda'] = str_replace(',', '.', $_POST['preco_venda']);
+
+        // Mantenha o filter_input como está
+        $preco_venda_post = filter_input(INPUT_POST, 'preco_venda', FILTER_VALIDATE_FLOAT);
 
         if ($id_produto) {
             try {
@@ -53,7 +58,7 @@
             }
         }
     }
-    
+
     // ETAPA 2: Processar os dados enviados pelo formulário (método POST)
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Coleta e filtra os dados do formulário
@@ -71,16 +76,16 @@
         if (empty($nome_post) || empty($id_categoria_post) || $id_produto_post === false) {
             $erros[] = "Todos os campos obrigatórios devem ser preenchidos.";
         }
-        
+
         // Inicializa o nome da imagem com o valor atual do banco
         $nome_imagem = $_POST['imagem_atual'] ?? null;
-        
+
         // Verifica se uma nova imagem foi enviada
         if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
             $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
             $nome_imagem = uniqid() . '.' . $extensao;
             $destino = 'img/' . $nome_imagem;
-            
+
             // Move o arquivo temporário para o destino final
             if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $destino)) {
                 $erros[] = "Erro ao fazer o upload da imagem.";
@@ -106,7 +111,7 @@
                     imagem = ?
                 WHERE id_produto = ?
                 HEREDOC;
-                
+
                 $stmt_update = $conn->prepare($sql_update);
                 $stmt_update->execute([
                     $nome_post,
@@ -134,7 +139,7 @@
             }
         }
     }
-    
+
     // Busca todas as categorias para preencher o <select>
     $categorias = [];
     try {
@@ -174,7 +179,7 @@
 
                         <div class="mb-3">
                             <label for="preco_venda" class="form-label">Preço de Custo:</label>
-                            <input type="number" name="preco_venda" id="preco_venda" class="form-control" step="0.01" value="<?php echo htmlspecialchars($preco_venda); ?>" required>
+                            <input type="number" name="preco_venda" id="preco_venda" class="form-control" step="any" value="<?php echo htmlspecialchars($preco_venda); ?>" required>
                         </div>
 
                         <div class="mb-3">

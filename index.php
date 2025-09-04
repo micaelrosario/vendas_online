@@ -113,8 +113,8 @@ require './src/db_disconnect_pdo.php';
                             <?php
                             $caminho_imagem = !empty($produto['imagem']) ? 'img/' . $produto['imagem'] : 'img/default_product.jpg';
                             ?>
-                            <img src="<?php echo htmlspecialchars($caminho_imagem); ?>" class="card-img-top" alt="Imagem do produto <?php echo htmlspecialchars($produto['nome']); ?>">
-
+                            <img src="<?php echo htmlspecialchars($caminho_imagem); ?>" class="card-img-top" alt="Imagem do produto <?php echo htmlspecialchars($produto['nome']); ?>" style=" height: 200px; object-fit: cover;">
+                        
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title"><?php echo htmlspecialchars($produto['nome']); ?></h5>
                                 <p class="card-text text-muted small"><?php echo htmlspecialchars($produto['nome_categoria']); ?></p>

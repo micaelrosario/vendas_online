@@ -7,6 +7,7 @@
     <title>Cadastrar Categoria</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -27,6 +28,11 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="prefixo_sku" class="form-label">Prefixo da Categoria (Ex: ELE, LIV):</label>
+                        <input type="text" name="prefixo_sku" id="prefixo_sku" class="form-control" maxlength="5" required>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="descricao" class="form-label">Descrição:</label>
                         <textarea name="descricao" id="descricao" class="form-control" rows="4" required></textarea>
                     </div>
@@ -41,20 +47,35 @@
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $nome = isset($_POST['nome']) ? trim($_POST['nome']) : '';
                     $descricao = isset($_POST['descricao']) ? trim($_POST['descricao']) : '';
+                    $prefixo_sku = isset($_POST['prefixo_sku']) ? strtoupper(trim($_POST['prefixo_sku'])) : '';
 
                     // Valida se os campos não estão vazios
-                    if (!empty($nome) && !empty($descricao)) {
+                    if (!empty($nome) && !empty($descricao) && !empty($prefixo_sku)) {
                         try {
-                            // Prepara e executa a inserção no banco de dados
-                            $consulta_sql = "INSERT INTO categorias (nome, descricao) VALUES (?, ?)";
-                            $stmt = $conn->prepare($consulta_sql);
-                            $stmt->execute([$nome, $descricao]);
+                            // 1. Verifique se o prefixo já existe no banco de dados
+                            $sql_check = "SELECT COUNT(*) FROM categorias WHERE prefixo_sku = ?";
+                            $stmt_check = $conn->prepare($sql_check);
+                            $stmt_check->execute([$prefixo_sku]);
+                            
+                            if ($stmt_check->fetchColumn() > 0) {
+                                echo <<<HEREDOC
+                                <div class="alert alert-danger text-center mt-3" role="alert">
+                                    Erro: O prefixo de SKU '<b>{$prefixo_sku}</b>' já existe. Por favor, escolha outro.
+                                </div>
+                                HEREDOC;
+                            } else {
+                                // 2. Se o prefixo for único, prepare e execute a inserção
+                                $consulta_sql = "INSERT INTO categorias (nome, descricao, prefixo_sku) VALUES (?, ?, ?)";
+                                $stmt = $conn->prepare($consulta_sql);
+                                $stmt->execute([$nome, $descricao, $prefixo_sku]);
 
-                            echo <<<HEREDOC
-                            <div class="alert alert-success text-center mt-3" role="alert">
-                                Categoria "<b>{$nome}</b>" cadastrada com sucesso!
-                            </div>
-                            HEREDOC;
+                                echo <<<HEREDOC
+                                <div class="alert alert-success text-center mt-3" role="alert">
+                                    Categoria "<b>{$nome}</b>" com prefixo "<b>{$prefixo_sku}</b>" cadastrada com sucesso!
+                                </div>
+                                HEREDOC;
+                            }
+
                         } catch (PDOException $e) {
                             // Mostra um erro caso a inserção falhe
                             echo "<div class='alert alert-danger mt-3' role='alert'><b>Error:</b> " . $e->getMessage() . "</div>";

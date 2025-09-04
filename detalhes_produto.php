@@ -1,17 +1,22 @@
 <?php
+session_start();
 // Imports do PHP
 require_once './src/nav_bar.php';
 require_once './src/db_connection_pdo.php';
 
 $produto = null;
 $mensagem = '';
+$sucesso_adicionar = false;
+
+// Verifica se a mensagem de sucesso foi enviada na URL
+if (isset($_GET['status']) && $_GET['status'] == 'adicionado') {
+    $sucesso_adicionar = true;
+}
 
 if (isset($_GET['id'])) {
     $id_produto = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
     if ($id_produto) {
         try {
-            // Busca todos os detalhes do produto
-            // Note o uso de LEFT JOIN para garantir que o produto seja encontrado mesmo sem categoria
             $sql = "SELECT p.*, c.nome AS nome_categoria, c.descricao AS descricao_categoria FROM produtos AS p LEFT JOIN categorias AS c ON p.id_categoria = c.id_categoria WHERE p.id_produto = ?";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$id_produto]);
@@ -39,11 +44,20 @@ require './src/db_disconnect_pdo.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Produto</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="css/index.css" rel="stylesheet">
 </head>
 <body>
-
     <div class="container my-5">
+        <?php 
+        if ($sucesso_adicionar): 
+        ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> Produto adicionado ao carrinho com sucesso!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php endif; ?>
+
         <?php if ($produto): ?>
             <div class="row">
                 <div class="col-md-6 mb-4">
@@ -64,7 +78,9 @@ require './src/db_disconnect_pdo.php';
                     <p><b>SKU:</b> <?php echo htmlspecialchars($produto['sku']); ?></p>
                     <p><b>Em estoque:</b> <?php echo htmlspecialchars($produto['quantidade_estoque']); ?></p>
                     
-                    <button class="btn btn-primary btn-lg mt-3">Adicionar ao Carrinho</button>
+                    <a href="adicionar_carrinho.php?id=<?php echo htmlspecialchars($produto['id_produto']); ?>" class="btn btn-primary btn-lg mt-3">
+                        <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
+                    </a>
                     <a href="index.php" class="btn btn-outline-secondary btn-lg mt-3">Voltar aos Produtos</a>
                 </div>
             </div>
