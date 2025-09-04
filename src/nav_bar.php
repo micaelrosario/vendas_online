@@ -1,3 +1,4 @@
+
 <nav class="navbar navbar-expand-lg bg-primary border-bottom border-body mb-5 py-3" data-bs-theme="dark">
     <div class="container">
         <a class="navbar-brand me-5" href="index.php">Loja Online</a>
@@ -29,6 +30,14 @@
                         <li><a class="dropdown-item" href="cadastrar_categoria.php">Categorias</a></li>
                         <li><a class="dropdown-item" href="cadastrar_cliente.php">Clientes</a></li>
                     </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="carrinho.php">
+                        <i class="bi bi-cart3" style="font-size: 1.5rem;"></i>
+                        <strong class="mx-2">Carrinho</strong>
+                    </a>
                 </li>
             </ul>
         </div>

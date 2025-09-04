@@ -38,6 +38,7 @@ require './src/db_disconnect_pdo.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Loja Online</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" defer>
     <link href="css/index.css" rel="stylesheet">
     <style>
         .card-produto {
@@ -45,6 +46,7 @@ require './src/db_disconnect_pdo.php';
             cursor: pointer;
             text-decoration: none;
             color: inherit;
+            max-width: 400px;
         }
 
         .card-produto:hover {
