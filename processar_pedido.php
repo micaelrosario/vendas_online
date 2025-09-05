@@ -65,9 +65,9 @@ require './src/db_disconnect_pdo.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Processando Pedido</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <?php include './src/nav_bar.php'; ?>
 
     <div class="container my-5">
         <div class="text-center">
